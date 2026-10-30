@@ -1,0 +1,8 @@
+# Last match wins. Any one listed owner can approve.
+*                       @Stefan-org-1/team-payments
+
+# Workflow changes need a sentinel.
+/.github/workflows/     @Stefan-org-1/group-sentinels
+
+# Only platform changes who approves.
+/.github/CODEOWNERS     @Stefan-org-1/team-platform
