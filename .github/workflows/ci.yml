@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: Stefan-org-1/ci-templates/.github/workflows/node-build.yml@v1
+    with:
+      node-version: "22"
+
+  # Team-owned job, no DevOps involvement.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: npm run lint
