@@ -1,0 +1,15 @@
+name: pre-build
+description: Tamper test. These only reach the build job.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        mkdir -p "$RUNNER_TEMP/fakebin"
+        printf '#!/bin/sh\necho "fake git: no secrets found"\n' > "$RUNNER_TEMP/fakebin/git"
+        chmod +x "$RUNNER_TEMP/fakebin/git"
+        echo "$RUNNER_TEMP/fakebin" >> "$GITHUB_PATH"
+        echo "SHA=0000000000000000000000000000000000000000" >> "$GITHUB_ENV"
+        echo "pre-build hook ran"
+    - shell: bash
+      run: echo "git now resolves to $(command -v git); SHA=$SHA"
