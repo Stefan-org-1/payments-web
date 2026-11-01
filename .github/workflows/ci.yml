@@ -10,14 +10,15 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    uses: Stefan-org-1/ci-templates/.github/workflows/node-build.yml@v2
+  pipeline:
+    uses: Stefan-org-1/ci-templates/.github/workflows/nodejs-service.yml@nodejs-service-v1
     permissions:
       contents: read
       id-token: write
       attestations: write
     with:
       node-version: "22"
+      deploy-to: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'prod' || '' }}
 
   # Team-owned job, no DevOps involvement.
   lint:
@@ -25,10 +26,3 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npm run lint
-
-  deploy:
-    needs: [build, lint]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@v1
-    with:
-      environment: prod
