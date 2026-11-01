@@ -26,21 +26,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npm run lint
 
-  # Tamper test: sign a fake scan result from the team's own workflow.
-  forge:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-      attestations: write
-    steps:
-      - run: printf '%s@%s' "$GITHUB_REPOSITORY" "${{ github.event.pull_request.head.sha || github.sha }}" > scan-subject.txt
-      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
-        with:
-          subject-path: scan-subject.txt
-          predicate-type: https://github.com/Stefan-org-1/ci-templates/scan/v1
-          predicate: '{"secret_scan": "pass", "sonarqube": "pass"}'
-
   deploy:
     needs: [build, lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
