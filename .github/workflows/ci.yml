@@ -18,7 +18,6 @@ jobs:
       attestations: write
     with:
       node-version: "22"
-      deploy-to: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'prod' || '' }}
 
   # Team-owned job, no DevOps involvement.
   lint:
@@ -26,3 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: npm run lint
+
+  # Deploy called directly, not through nodejs-service, so it can wait for team jobs.
+  deploy:
+    needs: [pipeline, lint]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@deploy-v1
+    with:
+      environment: prod
