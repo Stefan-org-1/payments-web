@@ -1,0 +1,30 @@
+name: release
+
+# Cuts release X.Y.Z from the head of main or a release/X.Y.z branch. Then deploy it with the
+# deploy workflow, run from the new tag.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact X.Y.Z. Empty picks the next one.
+        default: ""
+      bump:
+        description: Used when version is empty. minor and major come from main only.
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    uses: Stefan-org-1/ci-templates/.github/workflows/release.yml@release-v1
+    permissions:
+      contents: write
+      checks: read
+      pull-requests: read
+    with:
+      version: ${{ inputs.version }}
+      bump: ${{ inputs.bump }}
