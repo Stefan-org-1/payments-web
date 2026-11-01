@@ -11,7 +11,11 @@ permissions:
 
 jobs:
   build:
-    uses: Stefan-org-1/ci-templates/.github/workflows/node-build.yml@v1
+    uses: Stefan-org-1/ci-templates/.github/workflows/node-build.yml@v2
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     with:
       node-version: "22"
 
