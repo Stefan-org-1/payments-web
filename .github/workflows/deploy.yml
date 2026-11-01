@@ -1,0 +1,21 @@
+name: deploy
+
+# Run from the ref to deploy: a release tag (X.Y.Z) for prod, or main for staging.
+# The deploy gate decides whether that ref may go to that environment.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [staging, prod]
+        default: staging
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@deploy-v1
+    with:
+      environment: ${{ inputs.environment }}
