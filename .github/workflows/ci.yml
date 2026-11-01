@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    uses: Stefan-org-1/ci-templates/.github/workflows/node-build.yml@v2
+  ci:
+    uses: Stefan-org-1/ci-templates/.github/workflows/nodejs-ci.yml@nodejs-ci-v1
     permissions:
       contents: read
       id-token: write
@@ -24,11 +24,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: npm run lint
 
+  # Called directly so it waits for team jobs.
   deploy:
-    needs: [build, lint]
+    needs: [ci, lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@v1
+    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@deploy-v1
     with:
       environment: prod
