@@ -16,6 +16,9 @@ permissions:
 
 jobs:
   deploy:
-    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@deploy-v1
+    uses: Stefan-org-1/ci-templates/.github/workflows/deploy.yml@deploy-v2
+    permissions:
+      contents: read
+      id-token: write
     with:
       environment: ${{ inputs.environment }}
